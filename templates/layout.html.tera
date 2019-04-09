@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <div class="container">
+      <h3>Please select a file</h3>
+      <form method="get">
+        <input type="file" name="file_name"><br>
+        <input type ="submit" value="Submit">
+      </form>
+    </div>
+
+    <div class="output">
+      <p> {{file_contents}} </p>
+    </div>
+  </body>
+</html>
