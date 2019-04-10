@@ -11,13 +11,20 @@ use tera::Context;
 
 fn main() {
     rocket::ignite()
-    .mount("/", routes![index])
+    .mount("/", routes![index, file_up])
     .attach(Template::fairing())
     .launch();
 }
 
-#[get("/?<file_name>")]
-fn index(file_name: Option<String>) -> Template {
+#[get("/")]
+fn index() -> Template {
+    let mut context = Context::new();
+    context.insert("file_contents", "Please upload a file.");
+    Template::render("layout", &context)
+}
+
+#[post("/?<file_name>")]
+fn file_up(file_name: Option<String>) -> Template {
     let mut context = Context::new();
 
     match file_name {

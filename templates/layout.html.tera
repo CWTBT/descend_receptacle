@@ -6,7 +6,7 @@
   <body>
     <div class="container">
       <h3>Please select a file</h3>
-      <form method="get">
+      <form method="post">
         <input type="file" name="file_name"><br>
         <input type ="submit" value="Submit">
       </form>
