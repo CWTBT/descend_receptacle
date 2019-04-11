@@ -6,8 +6,10 @@ extern crate rocket_contrib;
 extern crate tera;
 extern crate rocket_multipart_form_data;
 
+use std::io::Read;
+use std::fs::File;
 use rocket::Data;
-use rocket_multipart_form_data::{MultipartFormData, MultipartFormDataOptions, MultipartFormDataField, FileField};
+use rocket_multipart_form_data::{mime, MultipartFormData, MultipartFormDataOptions, MultipartFormDataField, FileField};
 use rocket::http::ContentType;
 use rocket_contrib::templates::Template;
 use tera::Context;
@@ -32,16 +34,28 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
     let mut context = Context::new();
 
     let mut options = MultipartFormDataOptions::new();
-    options.allowed_fields.push(MultipartFormDataField::file("target_file"));
+    //options.allowed_fields.push(MultipartFormDataField::file("target_file"));
+    options.allowed_fields.push(MultipartFormDataField::file("target_file").content_type_by_string(Some(mime::IMAGE_STAR)).unwrap());
+    println!("SIZE: {}", options.allowed_fields.len());
 
     let multipart_form_data = MultipartFormData::parse(content_type, data, options).unwrap();
 
-    let up_file = multipart_form_data.files.get(&"target_file".to_string());
+    let target_file = multipart_form_data.files.get(&"target_file".to_string());
 
-    if let Some(up_file) = up_file {
-        match up_file {
+    if let Some(target_file) = target_file {
+        match target_file {
             FileField::Single(file) => {
-                let _file_path = &file.path;
+                let file_path = &file.path;
+
+                let mut f = File::open(file_path).unwrap();
+                //let mut buf = [0; 500];
+                let mut buf = String::new();
+
+                match f.read_to_string(&mut buf) {
+                    Ok(_) => {},
+                    Err(e) => {println!("Error reading file: {}", e);}
+                }
+                println!("!!!!!FILE CONTENTS!!!!! {}", buf);
             }
 
             FileField::Multiple(_files) => {}

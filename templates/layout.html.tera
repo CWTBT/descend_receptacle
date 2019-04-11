@@ -7,7 +7,7 @@
     <div class="container">
       <h3>Please select a file</h3>
       <form method="post" enctype="multipart/form-data">
-        <input type="file" name="file_name"><br>
+        <input type="file" name="data"><br>
         <input type ="submit" value="Submit">
       </form>
     </div>
