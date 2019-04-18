@@ -51,16 +51,7 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
             RawField::Single(file) => {
                 let file_name = file.file_name.unwrap();
                 let raw_data = file.raw.as_slice();
-
-                let path = format!("/home/cwtbt/{}", file_name);
-
-                let mut saved_file = File::create(path).unwrap();
-                match saved_file.write_all(raw_data) {
-                    Ok(_) => {},
-                    Err(e) => println!("Failed writing: {}", e)
-                }
-
-
+                save_file(file_name, raw_data);
             }
 
             RawField::Multiple(_files) => {}
@@ -69,4 +60,14 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
 
     context.insert("file_contents", "Upload complete.");
     Template::render("layout", &context)
+}
+
+fn save_file(file_name: String, contents: &[u8]) {
+    let path = format!("/home/cwtbt/Documents/RustProjects/descend_receptacle/Receptacle/{}", file_name);
+
+    let mut saved_file = File::create(path).unwrap();
+    match saved_file.write_all(contents) {
+        Ok(_) => {},
+        Err(e) => println!("Failed writing: {}", e)
+    }
 }
