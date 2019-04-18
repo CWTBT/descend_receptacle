@@ -7,7 +7,7 @@
     <div class="container">
       <h3>Please select a file</h3>
       <form method="post" acotoion="/" enctype="multipart/form-data">
-        <input name="image" type="file" accept="image/*"/>
+        <input name="file" type="file" accept="image/*"/>
         <button type="submit">Upload</button>
       </form>
     </div>

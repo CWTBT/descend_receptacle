@@ -6,10 +6,11 @@ extern crate rocket_contrib;
 extern crate tera;
 extern crate rocket_multipart_form_data;
 
-use std::io::Read;
+
 use std::fs::File;
+use std::io::Write;
 use rocket::Data;
-use rocket_multipart_form_data::{MultipartFormData, MultipartFormDataOptions, MultipartFormDataField, FileField};
+use rocket_multipart_form_data::{MultipartFormData, MultipartFormDataOptions, MultipartFormDataField, RawField};
 use rocket::http::ContentType;
 use rocket_contrib::templates::Template;
 use tera::Context;
@@ -34,7 +35,7 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
     let mut context = Context::new();
 
     let mut options = MultipartFormDataOptions::new();
-    options.allowed_fields.push(MultipartFormDataField::file("file"));
+    options.allowed_fields.push(MultipartFormDataField::raw("file"));
     let mut multipart_form_data = match MultipartFormData::parse(content_type, data, options) {
         Ok(multipart_form_data) => multipart_form_data,
         Err(err) => match err {
@@ -42,25 +43,27 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
         }
     };
 
-    let target_file = multipart_form_data.files.remove(&"file".to_string());
+
+    let target_file = multipart_form_data.raw.remove(&"file".to_string());
 
     if let Some(target_file) = target_file {
         match target_file {
-            FileField::Single(file) => {
-                let file_path = &file.path;
+            RawField::Single(file) => {
+                let file_name = file.file_name.unwrap();
+                let raw_data = file.raw.as_slice();
 
-                let mut f = File::open(file_path).unwrap();
-                //let mut buf = [0; 500];
-                let mut buf = String::new();
+                let path = format!("/home/cwtbt/{}", file_name);
 
-                match f.read_to_string(&mut buf) {
-                    Ok(_) => {println!("Okay: {}", buf);},
-                    Err(e) => {println!("Error reading file: {}", e);}
+                let mut saved_file = File::create(path).unwrap();
+                match saved_file.write_all(raw_data) {
+                    Ok(_) => {},
+                    Err(e) => println!("Failed writing: {}", e)
                 }
-                println!("!!!!!FILE CONTENTS!!!!! {}", buf);
+
+
             }
 
-            FileField::Multiple(_files) => {}
+            RawField::Multiple(_files) => {}
         }
     }
 
