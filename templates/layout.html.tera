@@ -6,9 +6,9 @@
   <body>
     <div class="container">
       <h3>Please select a file</h3>
-      <form method="post" enctype="multipart/form-data">
-        <input type="file" name="data"><br>
-        <input type ="submit" value="Submit">
+      <form method="post" acotoion="/" enctype="multipart/form-data">
+        <input name="image" type="file" accept="image/*"/>
+        <button type="submit">Upload</button>
       </form>
     </div>
 

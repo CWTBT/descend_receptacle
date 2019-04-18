@@ -9,7 +9,7 @@ extern crate rocket_multipart_form_data;
 use std::io::Read;
 use std::fs::File;
 use rocket::Data;
-use rocket_multipart_form_data::{mime, MultipartFormData, MultipartFormDataOptions, MultipartFormDataField, FileField};
+use rocket_multipart_form_data::{MultipartFormData, MultipartFormDataOptions, MultipartFormDataField, FileField};
 use rocket::http::ContentType;
 use rocket_contrib::templates::Template;
 use tera::Context;
@@ -34,13 +34,15 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
     let mut context = Context::new();
 
     let mut options = MultipartFormDataOptions::new();
-    //options.allowed_fields.push(MultipartFormDataField::file("target_file"));
-    options.allowed_fields.push(MultipartFormDataField::file("target_file").content_type_by_string(Some(mime::IMAGE_STAR)).unwrap());
-    println!("SIZE: {}", options.allowed_fields.len());
+    options.allowed_fields.push(MultipartFormDataField::file("file"));
+    let mut multipart_form_data = match MultipartFormData::parse(content_type, data, options) {
+        Ok(multipart_form_data) => multipart_form_data,
+        Err(err) => match err {
+            _ => panic!("{:?}", err)
+        }
+    };
 
-    let multipart_form_data = MultipartFormData::parse(content_type, data, options).unwrap();
-
-    let target_file = multipart_form_data.files.get(&"target_file".to_string());
+    let target_file = multipart_form_data.files.remove(&"file".to_string());
 
     if let Some(target_file) = target_file {
         match target_file {
@@ -52,7 +54,7 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
                 let mut buf = String::new();
 
                 match f.read_to_string(&mut buf) {
-                    Ok(_) => {},
+                    Ok(_) => {println!("Okay: {}", buf);},
                     Err(e) => {println!("Error reading file: {}", e);}
                 }
                 println!("!!!!!FILE CONTENTS!!!!! {}", buf);
