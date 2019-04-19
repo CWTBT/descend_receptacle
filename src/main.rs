@@ -23,10 +23,30 @@ fn main() {
     .launch();
 }
 
+fn get_folder_contents() -> Vec<String> {
+    let mut files = Vec::new();
+
+    let paths = std::fs::read_dir("/home/cwtbt/Documents/RustProjects/descend_receptacle/Receptacle").unwrap();
+
+    for file in paths {
+        files.push(file.unwrap().path().file_name().unwrap().to_string_lossy().into_owned());
+    }
+
+    files
+}
+
+fn pass_folder_contents(context: &mut Context) {
+    let contents_vec = get_folder_contents();
+    let contents_array = contents_vec.as_slice();
+    context.insert("folder_contents", contents_array);
+}
+
 #[get("/")]
 fn index() -> Template {
     let mut context = Context::new();
     context.insert("file_contents", "Please upload a file.");
+
+    pass_folder_contents(&mut context);
     Template::render("layout", &context)
 }
 
@@ -59,6 +79,7 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
     }
 
     context.insert("file_contents", "Upload complete.");
+    pass_folder_contents(&mut context);
     Template::render("layout", &context)
 }
 
