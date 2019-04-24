@@ -18,7 +18,7 @@ use tera::Context;
 
 fn main() {
     rocket::ignite()
-    .mount("/", routes![index, file_up])
+    .mount("/", routes![index, file_up, file_down])
     .attach(Template::fairing())
     .launch();
 }
@@ -79,6 +79,15 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
     }
 
     context.insert("file_contents", "Upload complete.");
+    pass_folder_contents(&mut context);
+    Template::render("layout", &context)
+}
+
+#[get("/download?<dl_target>")]
+fn file_down(dl_target: String) -> Template {
+    let mut context = Context::new();
+    context.insert("file_contents", &dl_target);
+
     pass_folder_contents(&mut context);
     Template::render("layout", &context)
 }
