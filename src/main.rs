@@ -7,9 +7,11 @@ extern crate tera;
 extern crate rocket_multipart_form_data;
 
 
+use std::sync::{Arc, Mutex};
 use std::fs::File;
 use std::io::Write;
 use rocket::Data;
+use rocket::response::Redirect;
 use rocket_multipart_form_data::{MultipartFormData, MultipartFormDataOptions, MultipartFormDataField, RawField};
 use rocket::http::ContentType;
 use rocket_contrib::templates::Template;
@@ -18,7 +20,7 @@ use tera::Context;
 
 fn main() {
     rocket::ignite()
-    .mount("/", routes![index, file_up, file_down])
+    .mount("/", routes![index, file_up, file_down, file_del])
     .attach(Template::fairing())
     .launch();
 }
@@ -58,16 +60,19 @@ fn file_down(file_name: String) -> File {
 }
 
 #[post("/delete/<file_name>")]
-fn file_del(file_name: String) -> File {
+fn file_del(file_name: String) -> Redirect {
     let path = format!("/home/cwtbt/Documents/RustProjects/descend_receptacle/Receptacle/{}", file_name);
-    let target_file = File::open(path).unwrap();
-    target_file
+
+    match std::fs::remove_file(path) {
+        Ok(_) => {},
+        Err(e) => {println!("Failed to delete file ({})", e)}
+    }
+    Redirect::to("/")
+
 }
 
 #[post("/", data = "<data>")]
-fn file_up(content_type: &ContentType, data: Data) -> Template {
-    let mut context = Context::new();
-
+fn file_up(content_type: &ContentType, data: Data) -> Redirect {
     let mut options = MultipartFormDataOptions::new();
     options.allowed_fields.push(MultipartFormDataField::raw("file"));
     let mut multipart_form_data = match MultipartFormData::parse(content_type, data, options) {
@@ -92,9 +97,7 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
         }
     }
 
-    context.insert("file_contents", "Upload complete.");
-    pass_folder_contents(&mut context);
-    Template::render("layout", &context)
+    Redirect::to("/")
 }
 
 fn save_file(file_name: String, contents: &[u8]) {
