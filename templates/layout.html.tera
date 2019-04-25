@@ -22,13 +22,13 @@
           <tr>
             <td>{{thing}}</td>
 
-            <form method="get" action="/download">
-              <td><input type="hidden" name="dl_target" value={{thing}}></td>
+            <form method="post" action="/download/{{thing}}" enctype="text/plain">
+              <td><input type="hidden" name="download_target" value={{thing}}></td>
               <td><button type="submit" id="download_button" </button>Download</td>
             </form>
 
-            <form method="get" action="/delete">
-              <td><input type="hidden" name="del_target" value={{thing}}></td>
+            <form method="post" action="/delete/{{thing}}" enctype="text/plain">
+              <td><input type="hidden" name="delete_target" value={{thing}}></td>
               <td><button type="submit" id="delete_button" </button>Delete</td>
             </form>
 

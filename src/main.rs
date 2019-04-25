@@ -50,6 +50,20 @@ fn index() -> Template {
     Template::render("layout", &context)
 }
 
+#[post("/download/<file_name>")]
+fn file_down(file_name: String) -> File {
+    let path = format!("/home/cwtbt/Documents/RustProjects/descend_receptacle/Receptacle/{}", file_name);
+    let target_file = File::open(path).unwrap();
+    target_file
+}
+
+#[post("/delete/<file_name>")]
+fn file_del(file_name: String) -> File {
+    let path = format!("/home/cwtbt/Documents/RustProjects/descend_receptacle/Receptacle/{}", file_name);
+    let target_file = File::open(path).unwrap();
+    target_file
+}
+
 #[post("/", data = "<data>")]
 fn file_up(content_type: &ContentType, data: Data) -> Template {
     let mut context = Context::new();
@@ -79,15 +93,6 @@ fn file_up(content_type: &ContentType, data: Data) -> Template {
     }
 
     context.insert("file_contents", "Upload complete.");
-    pass_folder_contents(&mut context);
-    Template::render("layout", &context)
-}
-
-#[get("/download?<dl_target>")]
-fn file_down(dl_target: String) -> Template {
-    let mut context = Context::new();
-    context.insert("file_contents", &dl_target);
-
     pass_folder_contents(&mut context);
     Template::render("layout", &context)
 }
