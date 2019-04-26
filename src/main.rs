@@ -7,7 +7,6 @@ extern crate tera;
 extern crate rocket_multipart_form_data;
 
 
-use std::sync::{Arc, Mutex};
 use std::fs::File;
 use std::io::Write;
 use rocket::Data;
@@ -46,7 +45,6 @@ fn pass_folder_contents(context: &mut Context) {
 #[get("/")]
 fn index() -> Template {
     let mut context = Context::new();
-    context.insert("file_contents", "Please upload a file.");
 
     pass_folder_contents(&mut context);
     Template::render("layout", &context)
@@ -67,6 +65,7 @@ fn file_del(file_name: String) -> Redirect {
         Ok(_) => {},
         Err(e) => {println!("Failed to delete file ({})", e)}
     }
+
     Redirect::to("/")
 
 }

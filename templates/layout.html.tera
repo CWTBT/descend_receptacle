@@ -13,10 +13,31 @@
     </div>
 
     <div class="output">
-      <p> {{file_contents}} </p>
+      <p>Welcome to the <b>RECEPTACLE</b></p>
     </div>
 
-    <div class="file_table">
+    <script>
+      function deleteRequest(filename) {
+        console.log("foo");
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+              //document.getElementById("file_table").innerHTML =
+              //this.responseText;
+              document.open();
+              document.write(this.responseText);
+              document.close();
+          }
+        };
+
+        xhttp.open("POST", "/delete/"+filename, true);
+        xhttp.send();
+      }
+
+    </script>
+
+    <div class="file_table" id="file_table">
       <table>
         {% for thing in folder_contents %}
           <tr>
@@ -27,10 +48,12 @@
               <td><button type="submit" id="download_button" </button>Download</td>
             </form>
 
-            <form method="post" action="/delete/{{thing}}" enctype="text/plain">
+            <!--<form method="post" action="/delete/{{thing}}" enctype="text/plain">
               <td><input type="hidden" name="delete_target" value={{thing}}></td>
               <td><button type="submit" id="delete_button" </button>Delete</td>
-            </form>
+            </form>-->
+
+            <td><button type="button" id="delete_button" onclick="deleteRequest('{{thing}}')">Delete</button></td>
 
           </tr>
         {% endfor %}
