@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+          background-color: #ccffff;
+      }
+
+
+      h1, p, a {
+        width: 50%;
+        margin: auto;
+        text-align: center;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1> 404 Not Found </h1>
+    <p> Sorry, the file you requested cannot be found. </p>
+    <p> Perhaps it has been deleted?</p>
+    <a href = "http://10.253.196.249:8888"> Return to RECEPTACLE </a>
+  </body>

@@ -6,7 +6,6 @@ extern crate rocket_contrib;
 extern crate tera;
 extern crate rocket_multipart_form_data;
 
-
 use std::fs::File;
 use std::io::Write;
 use rocket::Data;
@@ -16,12 +15,10 @@ use rocket::http::ContentType;
 use rocket_contrib::templates::Template;
 use tera::Context;
 
-
-
-
 fn main() {
     rocket::ignite()
     .mount("/", routes![index, file_up, file_open, file_del, update_contents])
+    .register(catchers![not_found])
     .attach(Template::fairing())
     .launch();
 }
@@ -87,9 +84,9 @@ fn update_contents() -> String {
 }
 
 #[get("/open/<file_name>")]
-fn file_open(file_name: String) -> File {
+fn file_open(file_name: String) -> Option<File> {
     let path = format!("/home/cwtbt/Documents/RustProjects/descend_receptacle/Receptacle/{}", file_name);
-    let return_file = File::open(path).unwrap();
+    let return_file = File::open(path).ok();
     return_file
 }
 
@@ -115,7 +112,6 @@ fn file_up(content_type: &ContentType, data: Data) -> Redirect {
         }
     };
 
-
     let target_file = multipart_form_data.raw.remove(&"file".to_string());
 
     if let Some(target_file) = target_file {
@@ -131,4 +127,10 @@ fn file_up(content_type: &ContentType, data: Data) -> Redirect {
     }
 
     Redirect::to("/")
+}
+
+#[catch(404)]
+fn not_found() -> Template {
+    let context = Context::new();
+    Template::render("404", &context)
 }
