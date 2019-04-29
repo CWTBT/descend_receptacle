@@ -36,7 +36,11 @@
       {% for thing in folder_contents %}
         <tr>
           <td>{{thing}}</td>
-          <td><button type="button" class="download_button" id="{{thing}}">Download</button></td>
+
+          <td><a href="/open/{{thing}}" download="{{thing}}">
+            <button>Download</button>
+          </a></td>
+
           <td><button type="button" class="delete_button" id="{{thing}}">Delete</button></td>
         </tr>
       {% endfor %}
