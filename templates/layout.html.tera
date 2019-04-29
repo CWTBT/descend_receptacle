@@ -2,63 +2,63 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <style>
+      body {
+          background-color: #ccffff;
+      }
+
+      table {
+        margin: auto;
+        border: 3px solid #00cc99;
+      }
+
+      .top {
+        width: 50%;
+        margin: auto;
+        text-align: center;
+      }
+
+    </style>
+     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
   </head>
   <body>
-    <div class="container">
+    <div class="top">
       <h3>Please select a file</h3>
       <form method="post" action="/" enctype="multipart/form-data">
         <input name="file" type="file">
         <button type="submit">Upload</button>
       </form>
-    </div>
-
-    <div class="output">
       <p>Welcome to the <b>RECEPTACLE</b></p>
     </div>
 
-    <script>
-      function deleteRequest(filename) {
-        console.log("foo");
-        var xhttp = new XMLHttpRequest();
-
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-              //document.getElementById("file_table").innerHTML =
-              //this.responseText;
-              document.open();
-              document.write(this.responseText);
-              document.close();
-          }
-        };
-
-        xhttp.open("POST", "/delete/"+filename, true);
-        xhttp.send();
-      }
-
-    </script>
-
     <div class="file_table" id="file_table">
       <table>
-        {% for thing in folder_contents %}
-          <tr>
-            <td>{{thing}}</td>
-
-            <form method="post" action="/download/{{thing}}" enctype="text/plain">
-              <td><input type="hidden" name="download_target" value={{thing}}></td>
-              <td><button type="submit" id="download_button" </button>Download</td>
-            </form>
-
-            <!--<form method="post" action="/delete/{{thing}}" enctype="text/plain">
-              <td><input type="hidden" name="delete_target" value={{thing}}></td>
-              <td><button type="submit" id="delete_button" </button>Delete</td>
-            </form>-->
-
-            <td><button type="button" id="delete_button" onclick="deleteRequest('{{thing}}')">Delete</button></td>
-
-          </tr>
-        {% endfor %}
+      {% for thing in folder_contents %}
+        <tr>
+          <td>{{thing}}</td>
+          <td><button type="button" class="download_button" id="{{thing}}">Download</button></td>
+          <td><button type="button" class="delete_button" id="{{thing}}">Delete</button></td>
+        </tr>
+      {% endfor %}
       </table>
     </div>
+
+    <script>
+      $(document).on("click", ".delete_button", function() {
+        let id = this.id;
+        $.ajax({url: "/delete/"+id, async: false, type: "post", success:function(result){
+          $(".file_table").html(result);
+        }})
+      });
+
+      setInterval(function() {
+        $.ajax({
+          url: "/update", type: "get", success: function(result){
+            $(".file_table").html(result);
+          }
+        })
+      }, 5000);
+    </script>
 
   </body>
 </html>

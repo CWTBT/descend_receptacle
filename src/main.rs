@@ -17,9 +17,11 @@ use rocket_contrib::templates::Template;
 use tera::Context;
 
 
+
+
 fn main() {
     rocket::ignite()
-    .mount("/", routes![index, file_up, file_down, file_del])
+    .mount("/", routes![index, file_up, file_down, file_del, update_contents])
     .attach(Template::fairing())
     .launch();
 }
@@ -50,11 +52,28 @@ fn index() -> Template {
     Template::render("layout", &context)
 }
 
+#[get("/update")]
+fn update_contents() -> String {
+    let contents = get_folder_contents();
+    let mut table = String::new();
+    table.push_str("<table>\n");
+    for s in contents {
+        let entry = format!("<tr><td>{}</td>", s);
+        let del = format!("<td><button type=\"button\" class=\"delete_button\" id=\"{}\">Delete</button></td></tr>\n", s);
+        let dow = format!("<td><button type=\"button\" class=\"download_button\" id=\"{}\">Download</button></td>", s);
+        table.push_str(&entry);
+        table.push_str(&dow);
+        table.push_str(&del)
+    }
+    table.push_str("</table>\n");
+    table
+}
+
 #[post("/download/<file_name>")]
 fn file_down(file_name: String) -> File {
     let path = format!("/home/cwtbt/Documents/RustProjects/descend_receptacle/Receptacle/{}", file_name);
-    let target_file = File::open(path).unwrap();
-    target_file
+    let return_file = File::open(path).unwrap();
+    return_file
 }
 
 #[post("/delete/<file_name>")]
@@ -65,9 +84,7 @@ fn file_del(file_name: String) -> Redirect {
         Ok(_) => {},
         Err(e) => {println!("Failed to delete file ({})", e)}
     }
-
-    Redirect::to("/")
-
+    Redirect::to("/update")
 }
 
 #[post("/", data = "<data>")]
